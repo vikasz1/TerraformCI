@@ -12,6 +12,13 @@ terraform {
 provider "azurerm" {
   features {}
   skip_provider_registration = true
+
+  # Use Service Principal authentication via environment variables
+  # (set by azure/login GitHub Action)
+  client_id       = var.client_id
+  client_secret   = var.client_secret
+  subscription_id = var.subscription_id
+  tenant_id       = var.tenant_id
 }
 
 
