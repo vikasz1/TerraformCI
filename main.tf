@@ -178,8 +178,8 @@ resource "azurerm_linux_web_app" "app_service" {
 
   app_settings = {
     "WEBSITES_ENABLE_APP_SERVICE_STORAGE" = "false"
-    "DOCKER_ENABLE_CI"                     = var.enable_ci_cd ? "true" : "false"
-    "ENVIRONMENT"                          = var.environment
+    "DOCKER_ENABLE_CI"                    = var.enable_ci_cd ? "true" : "false"
+    "ENVIRONMENT"                         = var.environment
   }
 
   identity {
@@ -205,10 +205,10 @@ resource "azurerm_app_service_virtual_network_swift_connection" "vnet_integratio
 
 # CI/CD - GitHub Actions configuration
 resource "azurerm_linux_web_app_slot" "staging" {
-  count           = var.enable_ci_cd ? 1 : 0
-  name            = "staging"
-  app_service_id  = azurerm_linux_web_app.app_service.id
-  
+  count          = var.enable_ci_cd ? 1 : 0
+  name           = "staging"
+  app_service_id = azurerm_linux_web_app.app_service.id
+
   site_config {
     minimum_tls_version = "1.2"
     http2_enabled       = true
@@ -216,7 +216,7 @@ resource "azurerm_linux_web_app_slot" "staging" {
 
   app_settings = {
     "WEBSITES_ENABLE_APP_SERVICE_STORAGE" = "false"
-    "ENVIRONMENT"                          = "${var.environment}-staging"
+    "ENVIRONMENT"                         = "${var.environment}-staging"
   }
 
   https_only = true
