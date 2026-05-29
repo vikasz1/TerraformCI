@@ -167,20 +167,29 @@ resource "azurerm_linux_web_app" "app_service" {
     minimum_tls_version = "1.2"
     http2_enabled       = true
 
+    # Use Node.js 18 LTS only when not using Docker
     dynamic "application_stack" {
-      for_each = var.docker_image != "" ? [1] : []
+      for_each = var.docker_image == "" ? [1] : []
       content {
-        docker_image_name   = var.docker_image
-        docker_registry_url = "https://index.docker.io"
+        node_version = "18-lts"
       }
     }
   }
 
-  app_settings = {
-    "WEBSITES_ENABLE_APP_SERVICE_STORAGE" = "false"
-    "DOCKER_ENABLE_CI"                     = var.enable_ci_cd ? "true" : "false"
-    "ENVIRONMENT"                          = var.environment
-  }
+  app_settings = merge(
+    {
+      "WEBSITES_ENABLE_APP_SERVICE_STORAGE" = "false"
+      "DOCKER_ENABLE_CI"                    = var.enable_ci_cd ? "true" : "false"
+      "ENVIRONMENT"                         = var.environment
+    },
+    var.docker_image != "" ? {
+      "DOCKER_CUSTOM_IMAGE_NAME"        = var.docker_image
+      "DOCKER_REGISTRY_SERVER_URL"      = var.docker_registry_url != "" ? var.docker_registry_url : "https://index.docker.io"
+      "DOCKER_REGISTRY_SERVER_USERNAME" = var.docker_registry_username != "" ? var.docker_registry_username : ""
+      "DOCKER_REGISTRY_SERVER_PASSWORD" = var.docker_registry_password != "" ? var.docker_registry_password : ""
+      "WEBSITES_PORT"                   = "80"
+    } : {}
+  )
 
   identity {
     type = "SystemAssigned"
@@ -205,10 +214,10 @@ resource "azurerm_app_service_virtual_network_swift_connection" "vnet_integratio
 
 # CI/CD - GitHub Actions configuration
 resource "azurerm_linux_web_app_slot" "staging" {
-  count           = var.enable_ci_cd ? 1 : 0
-  name            = "staging"
-  app_service_id  = azurerm_linux_web_app.app_service.id
-  
+  count          = var.enable_ci_cd ? 1 : 0
+  name           = "staging"
+  app_service_id = azurerm_linux_web_app.app_service.id
+
   site_config {
     minimum_tls_version = "1.2"
     http2_enabled       = true
@@ -216,7 +225,7 @@ resource "azurerm_linux_web_app_slot" "staging" {
 
   app_settings = {
     "WEBSITES_ENABLE_APP_SERVICE_STORAGE" = "false"
-    "ENVIRONMENT"                          = "${var.environment}-staging"
+    "ENVIRONMENT"                         = "${var.environment}-staging"
   }
 
   https_only = true
@@ -248,9 +257,9 @@ resource "azurerm_application_insights" "app_insights" {
 
 # Connect App Service to Application Insights
 resource "azurerm_monitor_diagnostic_setting" "app_service_diagnostics" {
-  name                       = "${var.app_service_name}-diagnostics-${var.environment}"
-  target_resource_id         = azurerm_linux_web_app.app_service.id
-  log_analytics_workspace_id = null
+  name               = "${var.app_service_name}-diagnostics-${var.environment}"
+  target_resource_id = azurerm_linux_web_app.app_service.id
+  storage_account_id = azurerm_storage_account.storage.id
 
   enabled_log {
     category = "AppServicePlatformLogs"
