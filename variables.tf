@@ -73,6 +73,27 @@ variable "docker_image" {
   default     = ""
 }
 
+variable "docker_registry_url" {
+  description = "Docker registry URL (e.g., https://myregistry.azurecr.io)"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "docker_registry_username" {
+  description = "Docker registry username"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "docker_registry_password" {
+  description = "Docker registry password"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
 variable "enable_ci_cd" {
   description = "Enable CI/CD pipeline"
   type        = bool
