@@ -1,0 +1,53 @@
+# Example Terraform Variables File
+# Copy this file to terraform.dev.tfvars or terraform.prod.tfvars and update values
+
+# Azure Service Principal credentials (preferably set via environment variables)
+# client_id       = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+# client_secret   = "your-client-secret"
+# subscription_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+# tenant_id       = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+
+# Environment Configuration
+environment = "dev" # or "prod"
+
+# Azure Location
+location = "Southeast Asia"
+
+# Resource Group
+resource_group_name = "terraform-app-rg-dev"
+
+# App Service Configuration
+app_service_name = "myapp"
+
+# App Service Plan Configuration
+# B = Basic (B1, B2, B3)
+# S = Standard (S1, S2, S3)
+# P = Premium (P1, P2, P3)
+app_service_plan_tier  = "B"
+app_service_plan_size  = "1"
+
+# Virtual Network Configuration
+vnet_address_space = ["10.0.0.0/16"]
+
+subnet_address_prefixes = {
+  app_subnet = ["10.0.1.0/24"]
+  db_subnet  = ["10.0.2.0/24"]
+}
+
+# Docker Configuration (optional)
+# Leave empty to use built-in stack
+docker_image = ""
+
+# CI/CD Configuration
+enable_ci_cd      = true
+repository_url    = "https://github.com/your-org/your-repo.git"
+repository_branch = "develop" # or "main" for prod
+
+# Resource Tags
+tags = {
+  Project     = "TerraformApp"
+  Environment = "Development"
+  CostCenter  = "DEV-001"
+  Owner       = "DevOps Team"
+  CreatedDate = "2024-01-01"
+}
