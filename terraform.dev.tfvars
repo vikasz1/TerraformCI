@@ -5,10 +5,10 @@ environment = "dev"
 resource_group_name = "terraform-app-rg-dev"
 location            = "Southeast Asia"
 
-# App Service Plan - Basic tier for development
-app_service_plan_tier = "B"
+# App Service Plan - Standard tier for development
+app_service_plan_tier = "S"
 app_service_plan_size = "1"
-app_service_name      = "myapp"
+app_service_name      = "myappvikasbaheri"
 
 # Virtual Network Configuration
 vnet_address_space = ["10.0.0.0/16"]
